@@ -1,0 +1,174 @@
+/* App.css */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(224,33,138);;
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  text-align: center;
+}
+
+.not-found h1 {
+  color: rgb(224,33,138);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Common utility classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.text-primary {
+  color: rgb(224,33,138);
+}
+
+.bg-primary {
+  background-color: rgb(224,33,138);
+  color: white;
+}
+
+/* Button styles */
+.button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.button-primary {
+  background-color: rgb(224,33,138);
+  color: white;
+}
+
+.button-primary:hover {
+  background-color: rgb(201,30,124);
+}
+
+.button-outline {
+  background-color: transparent;
+  border: 2px solid rgb(224,33,138);
+  color: rgb(224,33,138);
+}
+
+.button-outline:hover {
+  background-color: rgb(224,33,138);
+  color: white;
+}
+
+/* Layout utilities */
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-2 {
+  gap: 2rem;
+}
+
+/* Spacing utilities */
+.m-1 { margin: 1rem; }
+.m-2 { margin: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+
+/* Text utilities */
+.text-center {
+  text-align: center;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+/* Shadow utilities */
+.shadow {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.shadow-lg {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  main {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .not-found h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Focus styles for accessibility */
+:focus {
+  outline: 2px solid rgb(224,33,138);
+  outline-offset: 2px;
+}
+
+/* Selection style */
+::selection {
+  background-color: rgb(224,33,138);
+  color: white;
+}

@@ -27,3 +27,5 @@ go.work.sum
 # secrets
 
 secrets/*
+
+.DS_Store

@@ -1,1 +1,1 @@
-CREATE INDEX idx_customers_email ON customers(email);
+CREATE INDEX idx_customers_email ON retail_customers(email);

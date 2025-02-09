@@ -1,7 +1,11 @@
-CREATE TABLE customers (
+-- I had initially had this named customers and included an is_retail boolean 
+-- with the idea being a shared customer DB table for both employees and retail
+-- but as the spec requirement asked to keep retail customer functionality separate I decided
+-- to opt for a separate table
+CREATE TABLE retail_customers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    firstname VARCHAR(100),
-    lastname VARCHAR(100),
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
     email VARCHAR(255) UNIQUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -16,7 +20,7 @@ CREATE TABLE funds (
 
 CREATE TABLE investments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    customer_id UUID REFERENCES customers(id),
+    customer_id UUID REFERENCES retail_customers(id),
     fund_id UUID REFERENCES funds(id),
     amount DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

@@ -3,8 +3,6 @@ services:
     image: postgres:latest
     ports:
       - "5433:5432"
-    env_file:
-      - .env.dev
     secrets:
       - db_user
       - db_password
@@ -13,7 +11,7 @@ services:
       POSTGRES_USER_FILE: /run/secrets/db_user
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_DB_FILE: /run/secrets/db_name
-      ENVIRONMENT: development
+      PGENVIRONMENT: development
     volumes:
       - ./database/migrations:/docker-entrypoint-initdb.d/migrations
       - ./database/seeds:/docker-entrypoint-initdb.d/seeds
