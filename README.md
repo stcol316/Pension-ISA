@@ -13,7 +13,7 @@
 - **AWS DBMS Support** Easy migration to Aurora if managed service is desired via AWS DBMS (Database migration service) or we can opt for lower costs with AWS RDS
 - **Data Availability** Both provide multi-AZ deployment options for higher data availabilty and durability
 - **Database Seeding** Test data seeding provided for development environment only
-- **Generated UUIDs** Randomly generated UUIDs provided by uuid-ossp. The preference for this over sequenced IDs is to allow for the potential of database sharding in a distributed sysem.
+- **Generated UUIDs** Randomly generated UUIDs provided by uuid-ossp. The preference for this over sequenced IDs is to allow for the potential of database sharding in a distributed sysem. This also has the added benefit of enhanced security as IDs cannot be easily iterated through.
 - **Data Normalisation** 
 
 ## React
