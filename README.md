@@ -1,7 +1,9 @@
 # Pension-ISA
 
-Particular points of note a tagged throughout the codebase with the **Note** tag.
+This solution is mostly focused on the backend, data structures and overall repository structure.
+Care was given to ensure clear separation of concerns on the backend.
 
+Particular points of note a tagged throughout the codebase with the **Note** tag.
 Planned improvements are tagged through the codebase with the **TODO** tag.
 
 ## Database
@@ -22,6 +24,11 @@ Planned improvements are tagged through the codebase with the **TODO** tag.
 ## Backend
 - **Go** We use Go as our language of choice for the backend.
 - **Chi** Chi was selected for some convenience with routing. It was specifically chosen as it is lightweight and uses only stdlib + net/http
+- **Separation of Concerns**
+    - Handler layer: Only deals with HTTP concerns
+    - Service Layer: Contains any business logic between Handler and Respository layers
+    - Repository Layer: Handles data access
+- **Helpers and Middleware** Helper methods and middleware provide shared and reusable functionality
 - Environment variables
 
 ## API Design

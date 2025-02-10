@@ -10,7 +10,10 @@ import (
 
 	"net/http"
 
+	"github.com/stcol316/cushon-isa/internal/customer"
 	"github.com/stcol316/cushon-isa/internal/database"
+	"github.com/stcol316/cushon-isa/internal/fund"
+	"github.com/stcol316/cushon-isa/internal/investment"
 	"github.com/stcol316/cushon-isa/internal/server"
 )
 
@@ -18,12 +21,26 @@ func main() {
 
 	fmt.Println("Main entered...")
 
+	//Note: Easily swappable database configuration
 	db_service, dberr := database.NewPostgresDB()
 	if dberr != nil {
 		log.Fatal(dberr)
 	}
 	fmt.Printf("%+v\n", db_service)
-	server := server.NewServer(8080, db_service)
+
+	customerRepo := customer.NewRepository(db_service.DB())
+	fundRepo := fund.NewRepository(db_service.DB())
+	investmentRepo := investment.NewRepository(db_service.DB())
+
+	customerService := customer.NewService(customerRepo)
+	fundService := fund.NewService(fundRepo)
+	investmentService := investment.NewService(investmentRepo)
+
+	customerHandler := customer.NewHandler(customerService)
+	fundHandler := fund.NewHandler(fundService)
+	investmentHandler := investment.NewHandler(investmentService)
+
+	server := server.NewServer(8080, customerHandler, fundHandler, investmentHandler)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
@@ -39,8 +56,10 @@ func main() {
 	// Wait for the graceful shutdown to complete
 	<-done
 	log.Println("Graceful shutdown complete.")
+
 }
 
+// Note: Graceful shutdown
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)

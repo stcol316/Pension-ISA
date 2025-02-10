@@ -9,7 +9,7 @@ var deprecatedVersions = map[string]struct{}{
 	"/v1/": {},
 }
 
-func isDeprecatedVersion(path string) bool {
+func IsDeprecatedVersion(path string) bool {
 	for version := range deprecatedVersions {
 		if strings.Contains(path, version) {
 			return true

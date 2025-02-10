@@ -5,18 +5,24 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/stcol316/cushon-isa/internal/database"
+	"github.com/stcol316/cushon-isa/internal/customer"
+	"github.com/stcol316/cushon-isa/internal/fund"
+	"github.com/stcol316/cushon-isa/internal/investment"
 )
 
 type Server struct {
-	port int
-	db   database.Service
+	port              int
+	customerHandler   *customer.Handler
+	fundHandler       *fund.Handler
+	investmentHandler *investment.Handler
 }
 
-func NewServer(listenAddr int, db database.Service) *http.Server {
+func NewServer(listenAddr int, ch *customer.Handler, fh *fund.Handler, ih *investment.Handler) *http.Server {
 	NewServer := &Server{
-		port: 8080, //TODO: Use env var here
-		db:   db,
+		port:              8080, //TODO: Use env var here
+		customerHandler:   ch,
+		fundHandler:       fh,
+		investmentHandler: ih,
 	}
 
 	server := &http.Server{

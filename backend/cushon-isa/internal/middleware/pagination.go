@@ -6,7 +6,6 @@ import (
 	"strconv"
 )
 
-// Note: We use pagination for our GET List calls
 type PaginationParams struct {
 	Page     int
 	PageSize int
