@@ -65,13 +65,51 @@ func (s *postgresDB) CreateRetailCustomer(ctx context.Context, customer *models.
 }
 
 func (s *postgresDB) GetRetailCustomerByEmail(ctx context.Context, email string) (*models.RetailCustomer, error) {
-	// TODO: Implement customer retrieval by email logic
-	return nil, nil
+	query := `
+	SELECT id, first_name, last_name, email
+	FROM retail_customers
+	WHERE email = $1
+`
+	var customer models.RetailCustomer
+	err := s.db.QueryRowContext(ctx, query, email).Scan(
+		&customer.ID,
+		&customer.FirstName,
+		&customer.LastName,
+		&customer.Email,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("customer not found")
+		}
+		return nil, fmt.Errorf("failed to get customer: %w", err)
+	}
+
+	return &customer, nil
 }
 
 func (s *postgresDB) GetRetailCustomerByID(ctx context.Context, id string) (*models.RetailCustomer, error) {
-	// TODO: Implement customer retrieval by ID logic
-	return nil, nil
+	query := `
+	SELECT id, first_name, last_name, email
+	FROM retail_customers
+	WHERE id = $1
+`
+	var customer models.RetailCustomer
+	err := s.db.QueryRowContext(ctx, query, id).Scan(
+		&customer.ID,
+		&customer.FirstName,
+		&customer.LastName,
+		&customer.Email,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("customer not found")
+		}
+		return nil, fmt.Errorf("failed to get customer: %w", err)
+	}
+
+	return &customer, nil
 }
 
 func (s *postgresDB) ListFunds(ctx context.Context) ([]*models.Fund, error) {

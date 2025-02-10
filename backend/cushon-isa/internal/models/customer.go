@@ -13,6 +13,14 @@ type CreateRetailCustomerRequest struct {
 	Email     string `json:"email"`
 }
 
+type GetRetailCustomerByIdRequest struct {
+	Id string `json:"id"`
+}
+
+type GetRetailCustomerByEmailRequest struct {
+	Email string `json:"email"`
+}
+
 func NewRetailCustomer(firstName, lastName, email string) RetailCustomer {
 	return RetailCustomer{
 		FirstName: firstName,

@@ -1,29 +1,20 @@
 package server
 
 import (
-	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	mw "github.com/stcol316/cushon-isa/internal/api/middleware"
 	"github.com/stcol316/cushon-isa/internal/models"
+	helper "github.com/stcol316/cushon-isa/pkg/helpers"
 )
-
-// Note: We use pagination for our GET List calls
-type PaginationParams struct {
-	Page     int
-	PageSize int
-}
-
-// Note: Best practice to define our own key to avoid collisions
-type contextKey string
-
-const paginationParamsKey contextKey = "pagination"
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
@@ -48,22 +39,27 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/", s.HelloWorldHandler)
 
 	// Customer routes
-	r.Route("/customers", func(r chi.Router) {
-		r.Post("/retail", s.createRetailCustomerHandler)
-		r.Get("/{id}", s.getRetailCustomerHandler)
-	})
+	//Note: API versioning
+	//TODO: Split into separate services to facilitate microservice architecture
+	r.Route("/v1", func(r chi.Router) {
+		r.Route("/customers", func(r chi.Router) {
+			r.Post("/retail", s.createRetailCustomerHandler)
+			r.Get("/id/{id}", s.getRetailCustomerByIdHandler)
+			r.Get("/email/{email}", s.getRetailCustomerByEmailHandler)
+		})
 
-	// Fund routes
-	r.Route("/funds", func(r chi.Router) {
-		r.With(paginate).Get("/", s.listFundsHandler)
-		r.Get("/{id}", s.getFundHandler)
-	})
+		// Fund routes
+		r.Route("/funds", func(r chi.Router) {
+			r.With(mw.Paginate).Get("/", s.listFundsHandler)
+			r.Get("/{id}", s.getFundHandler)
+		})
 
-	// Investment routes
-	r.Route("/investments", func(r chi.Router) {
-		r.Post("/", s.createInvestmentHandler)
-		r.Get("/{id}", s.getInvestmentHandler)
-		r.With(paginate).Get("/customer/{customerId}", s.ListCustomerInvestmentsHandler)
+		// Investment routes
+		r.Route("/investments", func(r chi.Router) {
+			r.Post("/", s.createInvestmentHandler)
+			r.Get("/{id}", s.getInvestmentHandler)
+			r.With(mw.Paginate).Get("/customer/{customerId}", s.ListCustomerInvestmentsHandler)
+		})
 	})
 
 	// r.Get("/health", s.healthHandler)
@@ -71,83 +67,98 @@ func (s *Server) RegisterRoutes() http.Handler {
 	return r
 }
 
-// Note: Pagination middleware
-func paginate(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		page := 1
-		pageSize := 10
-
-		if p := r.URL.Query().Get("page"); p != "" {
-			if pageInt, err := strconv.Atoi(p); err == nil && pageInt > 0 {
-				page = pageInt
-			}
-		}
-
-		if size := r.URL.Query().Get("page_size"); size != "" {
-			if sizeInt, err := strconv.Atoi(size); err == nil && sizeInt > 0 {
-				pageSize = sizeInt
-			}
-		}
-
-		// Store pagination in context with previously defined key
-		ctx := context.WithValue(r.Context(), paginationParamsKey, PaginationParams{
-			Page:     page,
-			PageSize: pageSize,
-		})
-
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
-func WriteJSON(w http.ResponseWriter, status int, v interface{}) error {
-	// Set content type header
-	w.Header().Set("Content-Type", "application/json")
-
-	// Set the status code
-	w.WriteHeader(status)
-
-	// Encode and write the response body
-	return json.NewEncoder(w).Encode(v)
-}
-
 // Retail Customer handlers
 func (s *Server) createRetailCustomerHandler(w http.ResponseWriter, r *http.Request) {
-	//
-	createReq := new(models.CreateRetailCustomerRequest)
-	if err := json.NewDecoder(r.Body).Decode(createReq); err != nil {
-		WriteJSON(w, http.StatusBadRequest, map[string]string{
-			"error": err.Error(),
-		})
+	// TODO: Error handling could be improved here.
+	// We could probably split this out into a common decode and validate helper function
+	req := new(models.CreateRetailCustomerRequest)
+	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+		s.handleCustomerError(w, err)
 		return
 	}
 
-	rc := models.NewRetailCustomer(createReq.FirstName, createReq.LastName, createReq.Email)
-
-	if err := s.db.CreateRetailCustomer(r.Context(), &rc); err != nil {
-		WriteJSON(w, http.StatusInternalServerError, map[string]string{
-			"error": "Failed to create customer",
-		})
+	customer := models.NewRetailCustomer(req.FirstName, req.LastName, req.Email)
+	if err := s.db.CreateRetailCustomer(r.Context(), &customer); err != nil {
+		s.handleCustomerError(w, err)
 		return
 	}
 
-	WriteJSON(w, http.StatusOK, rc)
+	helper.RespondWithJSON(w, http.StatusOK, customer)
 }
 
-func (s *Server) getRetailCustomerHandler(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
-	resp["message"] = "Customer retrieved successfully"
-
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
+func (s *Server) getRetailCustomerByIdHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		helper.RespondWithError(w, http.StatusBadRequest, "customer ID is required")
+		return
 	}
 
-	_, _ = w.Write(jsonResp)
+	customer, err := s.db.GetRetailCustomerByID(r.Context(), id)
+	if err != nil {
+		s.handleCustomerError(w, err)
+		return
+	}
+
+	helper.RespondWithJSON(w, http.StatusOK, customer)
+
+}
+
+func (s *Server) getRetailCustomerByEmailHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "email")
+	if id == "" {
+		helper.RespondWithError(w, http.StatusBadRequest, "customer email is required")
+		return
+	}
+
+	customer, err := s.db.GetRetailCustomerByEmail(r.Context(), id)
+	if err != nil {
+		s.handleCustomerError(w, err)
+		return
+	}
+
+	helper.RespondWithJSON(w, http.StatusOK, customer)
+}
+
+func (s *Server) handleCustomerError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		helper.RespondWithError(w, http.StatusNotFound, "customer not found")
+	default:
+		helper.RespondWithError(w, http.StatusInternalServerError, err.Error())
+	}
 }
 
 // Fund Handlers
 func (s *Server) listFundsHandler(w http.ResponseWriter, r *http.Request) {
+	// // Get pagination from context
+	// params := r.Context().Value("pagination").(PaginationParams)
 
+	// // Calculate offset
+	// offset := (params.Page - 1) * params.PageSize
+
+	// // Use in your database query
+	// query := `
+	// 		SELECT id, name, description
+	// 		FROM funds
+	// 		LIMIT $1 OFFSET $2
+	// 	`
+
+	// funds, err := s.db.QueryContext(r.Context(), query, params.PageSize, offset)
+	// if err != nil {
+	// 	WriteJSON(w, http.StatusInternalServerError, map[string]string{
+	// 		"error": "Failed to fetch funds",
+	// 	})
+	// 	return
+	// }
+
+	// // Return paginated results
+	// WriteJSON(w, http.StatusOK, map[string]interface{}{
+	// 	"funds": funds,
+	// 	"pagination": map[string]int{
+	// 		"page":      params.Page,
+	// 		"page_size": params.PageSize,
+	// 	},
+	// })
 }
 
 func (s *Server) getFundHandler(w http.ResponseWriter, r *http.Request) {
