@@ -28,14 +28,17 @@ func main() {
 	}
 	fmt.Printf("%+v\n", db_service)
 
+	// Note: Repository Pattern. Handles data access
 	customerRepo := customer.NewRepository(db_service.DB())
 	fundRepo := fund.NewRepository(db_service.DB())
 	investmentRepo := investment.NewRepository(db_service.DB())
 
+	// Note: Service layer to handle business logic between DB and handlers
 	customerService := customer.NewService(customerRepo)
 	fundService := fund.NewService(fundRepo)
 	investmentService := investment.NewService(investmentRepo)
 
+	// Note: Presentation layer to handle APIs
 	customerHandler := customer.NewHandler(customerService)
 	fundHandler := fund.NewHandler(fundService)
 	investmentHandler := investment.NewHandler(investmentService)

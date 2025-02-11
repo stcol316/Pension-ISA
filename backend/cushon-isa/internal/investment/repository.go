@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/stcol316/cushon-isa/internal/models"
 )
@@ -22,6 +23,14 @@ func NewRepository(db *sql.DB) *Repository {
 }
 
 func (r *Repository) createInvestment(ctx context.Context, investment *models.Investment) error {
+	// Note: We begin a transaction that will rollback our actions if either insert or materialized view refresh fails
+	// This ensures data consistency between the investments table and view
+	tx, txerr := r.db.BeginTx(ctx, nil)
+	if txerr != nil {
+		return fmt.Errorf("failed to begin transaction: %w", txerr)
+	}
+	defer tx.Rollback()
+
 	query := `
 	INSERT INTO investments (customer_id, fund_id, amount)
 	VALUES ($1, $2, $3)
@@ -34,6 +43,19 @@ func (r *Repository) createInvestment(ctx context.Context, investment *models.In
 	)
 	if err != nil {
 		return fmt.Errorf("failed to make investment: %w", err)
+	}
+
+	log.Printf("Attempting to refresh materialized view")
+	// Note: Refresh materialized view
+	_, err = tx.ExecContext(ctx, "REFRESH MATERIALIZED VIEW customer_fund_totals")
+	if err != nil {
+		return fmt.Errorf("failed to refresh materialized view: %w", err)
+	}
+
+	log.Printf("Successfully refreshed materialized view")
+	// Everything worked as expected so we commit
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
 	return nil
@@ -62,6 +84,7 @@ func (r *Repository) listInvestmentsByCustomerID(ctx context.Context, id string,
 	}
 	defer rows.Close()
 
+	// Scan rows into our investments slice
 	var investments []models.Investment
 	for rows.Next() {
 		var investment models.Investment
@@ -102,4 +125,35 @@ func (r *Repository) getInvestmentByID(ctx context.Context, id string) (*models.
 	}
 
 	return &investment, nil
+}
+
+// Note: This is fetching data from the materialized view
+func (r *Repository) GetCustomerFundTotal(ctx context.Context, customerID, fundID string) (*models.InvestmentSummary, error) {
+	query := `
+        SELECT 
+            customer_id,
+            first_name,
+            last_name,
+            email,
+            fund_id,
+            fund_name,
+            total_investment
+        FROM customer_fund_totals
+        WHERE customer_id = $1 AND fund_id = $2`
+
+	var summary models.InvestmentSummary
+	err := r.db.QueryRowContext(ctx, query, customerID, fundID).Scan(
+		&summary.CustomerID,
+		&summary.FirstName,
+		&summary.LastName,
+		&summary.Email,
+		&summary.FundID,
+		&summary.FundName,
+		&summary.TotalInvestment,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error querying investment summary: %w", err)
+	}
+
+	return &summary, nil
 }

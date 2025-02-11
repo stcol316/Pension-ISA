@@ -50,3 +50,7 @@ func (s *Service) listInvestmentsByCustomerID(ctx context.Context, id string, pa
 func (s *Service) getInvestmentByID(ctx context.Context, id string) (*models.Investment, error) {
 	return s.repo.getInvestmentByID(ctx, id)
 }
+
+func (s *Service) getCustomerFundTotal(ctx context.Context, customer_id, fund_id string) (*models.InvestmentSummary, error) {
+	return s.repo.GetCustomerFundTotal(ctx, customer_id, fund_id)
+}

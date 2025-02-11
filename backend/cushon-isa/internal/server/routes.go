@@ -56,6 +56,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Post("/", s.investmentHandler.CreateInvestmentHandler)
 			r.Get("/id/{id}", s.investmentHandler.GetInvestmentByIDHandler)
 			r.With(mw.Paginate).Get("/customer/{customerId}", s.investmentHandler.ListCustomerInvestmentsHandler)
+			r.Get("/customer/{customerId}/fund/{fundId}", s.investmentHandler.GetCustomerFundTotalHandler)
 		})
 	})
 

@@ -1,6 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 \i /docker-entrypoint-initdb.d/migrations/001_create_tables.sql
+\i /docker-entrypoint-initdb.d/views/001_create_materialized_views.sql
 \i /docker-entrypoint-initdb.d/migrations/002_create_indexes.sql
 
 \set ENVIRONMENT `echo "$PGENVIRONMENT"`

@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#Note: Script to generate secret files
 # Check dir exists
 mkdir -p ../secrets
 

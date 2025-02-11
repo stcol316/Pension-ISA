@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Investment struct {
 	ID         string    `json:"id"`
@@ -9,6 +11,16 @@ type Investment struct {
 	Amount     float64   `json:"amount"`
 	CreatedAt  time.Time `json:"createdAt"`
 	Status     string    `json:"status"` // TODO: We probably want something to confirm status of investments here
+}
+
+type InvestmentSummary struct {
+	CustomerID      string  `json:"customer_id"`
+	FirstName       string  `json:"first_name"`
+	LastName        string  `json:"last_name"`
+	Email           string  `json:"email"`
+	FundID          string  `json:"fund_id"`
+	FundName        string  `json:"fund_name"`
+	TotalInvestment float64 `json:"total_investment"`
 }
 
 type CreateInvestmentRequest struct {

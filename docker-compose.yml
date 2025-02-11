@@ -15,6 +15,7 @@ services:
     volumes:
       - ./database/migrations:/docker-entrypoint-initdb.d/migrations
       - ./database/seeds:/docker-entrypoint-initdb.d/seeds
+      - ./database/views:/docker-entrypoint-initdb.d/views
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

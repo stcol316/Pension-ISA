@@ -80,6 +80,23 @@ func (h *Handler) ListCustomerInvestmentsHandler(w http.ResponseWriter, r *http.
 	helper.RespondWithJSON(w, http.StatusOK, result)
 }
 
+func (h *Handler) GetCustomerFundTotalHandler(w http.ResponseWriter, r *http.Request) {
+	customer_id := chi.URLParam(r, "customerId")
+	fund_id := chi.URLParam(r, "fundId")
+	if customer_id == "" || fund_id == "" {
+		helper.RespondWithError(w, http.StatusBadRequest, "customer ID and fund ID required")
+		return
+	}
+
+	investment, err := h.service.getCustomerFundTotal(r.Context(), customer_id, fund_id)
+	if err != nil {
+		h.handleInvestmentError(w, err)
+		return
+	}
+
+	helper.RespondWithJSON(w, http.StatusOK, investment)
+}
+
 func (h *Handler) handleInvestmentError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
