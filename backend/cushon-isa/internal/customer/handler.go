@@ -51,7 +51,6 @@ func (h *Handler) GetRetailCustomerByIdHandler(w http.ResponseWriter, r *http.Re
 	}
 
 	helper.RespondWithJSON(w, http.StatusOK, customer)
-
 }
 
 func (h *Handler) GetRetailCustomerByEmailHandler(w http.ResponseWriter, r *http.Request) {

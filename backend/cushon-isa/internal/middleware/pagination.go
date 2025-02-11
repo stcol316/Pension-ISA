@@ -14,7 +14,7 @@ type PaginationParams struct {
 // Note: Best practice to define our own key to avoid collisions
 type contextKey string
 
-const paginationParamsKey contextKey = "pagination"
+const PaginationParamsKey contextKey = "pagination"
 
 // Note: Pagination middleware
 func Paginate(next http.Handler) http.Handler {
@@ -35,11 +35,16 @@ func Paginate(next http.Handler) http.Handler {
 		}
 
 		// Store pagination in context with previously defined key
-		ctx := context.WithValue(r.Context(), paginationParamsKey, PaginationParams{
+		ctx := context.WithValue(r.Context(), PaginationParamsKey, PaginationParams{
 			Page:     page,
 			PageSize: pageSize,
 		})
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetPaginationParams(ctx context.Context) (PaginationParams, bool) {
+	params, ok := ctx.Value(PaginationParamsKey).(PaginationParams)
+	return params, ok
 }

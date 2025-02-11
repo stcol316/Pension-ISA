@@ -48,13 +48,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Route("/funds", func(r chi.Router) {
 			// Note: We use pagination for our GET List calls
 			r.With(mw.Paginate).Get("/", s.fundHandler.ListFundsHandler)
-			r.Get("/{id}", s.fundHandler.GetFundByIdHandler)
+			r.Get("/id/{id}", s.fundHandler.GetFundByIdHandler)
 		})
 
 		// Investment routes
 		r.Route("/investments", func(r chi.Router) {
 			r.Post("/", s.investmentHandler.CreateInvestmentHandler)
-			r.Get("/{id}", s.investmentHandler.GetInvestmentByIDHandler)
+			r.Get("/id/{id}", s.investmentHandler.GetInvestmentByIDHandler)
 			r.With(mw.Paginate).Get("/customer/{customerId}", s.investmentHandler.ListCustomerInvestmentsHandler)
 		})
 	})
