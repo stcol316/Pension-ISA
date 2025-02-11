@@ -21,7 +21,7 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) listFunds(ctx context.Context, page int, pageSize int) ([]models.Fund, int, error) {
+func (r *Repository) listFunds(ctx context.Context, page, pageSize int) ([]models.Fund, int, error) {
 	offset := (page - 1) * pageSize
 
 	// First, get total count

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	mw "github.com/stcol316/cushon-isa/internal/middleware"
 	"github.com/stcol316/cushon-isa/internal/models"
 )
 
@@ -11,23 +12,11 @@ type Service struct {
 	repo *Repository
 }
 
-type PaginatedResult struct {
-	Data       interface{} `json:"data"`
-	Pagination struct {
-		CurrentPage int  `json:"current_page"`
-		PageSize    int  `json:"page_size"`
-		TotalItems  int  `json:"total_items"`
-		TotalPages  int  `json:"total_pages"`
-		HasNext     bool `json:"has_next"`
-		HasPrevious bool `json:"has_previous"`
-	} `json:"pagination"`
-}
-
 func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
 }
 
-func (s *Service) listFunds(ctx context.Context, page int, pageSize int) (*PaginatedResult, error) {
+func (s *Service) listFunds(ctx context.Context, page, pageSize int) (*mw.PaginatedResult, error) {
 
 	funds, total, err := s.repo.listFunds(ctx, page, pageSize)
 	if err != nil {
@@ -37,7 +26,7 @@ func (s *Service) listFunds(ctx context.Context, page int, pageSize int) (*Pagin
 	// Calculate pagination metadata
 	totalPages := (total + pageSize - 1) / pageSize
 
-	result := &PaginatedResult{
+	result := &mw.PaginatedResult{
 		Data: funds,
 	}
 	result.Pagination.CurrentPage = page

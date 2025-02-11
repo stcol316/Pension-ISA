@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 \set ENVIRONMENT `echo "$PGENVIRONMENT"`
 \echo 'Running in environment: ' :ENVIRONMENT
--- We will not want to seed test data outside of dev
+-- Note: We will not want to seed test data outside of dev
 SELECT (:'ENVIRONMENT' = 'development') AS is_dev \gset
 \if :is_dev
     \echo 'Running development seeds...'
