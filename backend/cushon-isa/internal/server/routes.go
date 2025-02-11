@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -9,8 +10,20 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/jwtauth/v5"
 	mw "github.com/stcol316/cushon-isa/internal/middleware"
 )
+
+// TODO: This is just an example auth for testing purposes.
+// For a full implementation we would generate this at login and pass back to the user to use in request headers
+var tokenAuth *jwtauth.JWTAuth
+
+func init() {
+	tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
+
+	_, tokenString, _ := tokenAuth.Encode(map[string]interface{}{"user_id": 123})
+	fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
+}
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
@@ -38,8 +51,21 @@ func (s *Server) RegisterRoutes() http.Handler {
 	//Note: API versioning
 	//TODO: Split into separate services to facilitate microservice architecture
 	r.Route("/v1", func(r chi.Router) {
-		r.Route("/customers", func(r chi.Router) {
-			r.Post("/retail", s.customerHandler.CreateRetailCustomerHandler)
+		r.Group(func(r chi.Router) {
+			// Note: Simple auth example usage for protected routes
+			r.Use(jwtauth.Verifier(tokenAuth))
+			r.Use(jwtauth.Authenticator(tokenAuth))
+			// Investment routes
+			r.Route("/investments", func(r chi.Router) {
+				r.Post("/", s.investmentHandler.CreateInvestmentHandler)
+				r.Get("/id/{id}", s.investmentHandler.GetInvestmentByIDHandler)
+				r.With(mw.Paginate).Get("/customer/{customerId}", s.investmentHandler.ListCustomerInvestmentsHandler)
+				r.Get("/customer/{customerId}/fund/{fundId}", s.investmentHandler.GetCustomerFundTotalHandler)
+			})
+		})
+
+		r.Route("/customers/retail", func(r chi.Router) {
+			r.Post("/", s.customerHandler.CreateRetailCustomerHandler)
 			r.Get("/id/{id}", s.customerHandler.GetRetailCustomerByIdHandler)
 			r.Get("/email/{email}", s.customerHandler.GetRetailCustomerByEmailHandler)
 		})
@@ -50,16 +76,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.With(mw.Paginate).Get("/", s.fundHandler.ListFundsHandler)
 			r.Get("/id/{id}", s.fundHandler.GetFundByIdHandler)
 		})
-
-		// Investment routes
-		r.Route("/investments", func(r chi.Router) {
-			r.Post("/", s.investmentHandler.CreateInvestmentHandler)
-			r.Get("/id/{id}", s.investmentHandler.GetInvestmentByIDHandler)
-			r.With(mw.Paginate).Get("/customer/{customerId}", s.investmentHandler.ListCustomerInvestmentsHandler)
-			r.Get("/customer/{customerId}/fund/{fundId}", s.investmentHandler.GetCustomerFundTotalHandler)
-		})
 	})
 
+	//TODO: Ping the database periodically
 	// r.Get("/health", s.healthHandler)
 
 	return r

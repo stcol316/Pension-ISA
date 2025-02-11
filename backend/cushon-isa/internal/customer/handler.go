@@ -7,7 +7,9 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/stcol316/cushon-isa/internal/models"
+	"github.com/stcol316/cushon-isa/pkg/helpers"
 	helper "github.com/stcol316/cushon-isa/pkg/helpers"
 )
 
@@ -20,7 +22,11 @@ func NewHandler(service *Service) *Handler {
 }
 
 func (h *Handler) CreateRetailCustomerHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Error handling could be improved here.
+	// TODO: Error handling and validation could be improved here.
+	if ct := r.Header.Get("Content-Type"); ct != "application/json" {
+		helpers.RespondWithError(w, http.StatusUnsupportedMediaType, "Content-Type must be application/json")
+		return
+	}
 	// We could probably split this out into a common decode and validate helper function
 	req := new(models.CreateRetailCustomerRequest)
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
@@ -41,6 +47,11 @@ func (h *Handler) GetRetailCustomerByIdHandler(w http.ResponseWriter, r *http.Re
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		helper.RespondWithError(w, http.StatusBadRequest, "customer ID is required")
+		return
+	}
+
+	if _, err := uuid.Parse(id); err != nil {
+		helper.RespondWithError(w, http.StatusBadRequest, "invalid customer ID format")
 		return
 	}
 

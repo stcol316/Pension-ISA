@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	mw "github.com/stcol316/cushon-isa/internal/middleware"
 	"github.com/stcol316/cushon-isa/internal/models"
 	"github.com/stcol316/cushon-isa/pkg/helpers"
@@ -24,6 +25,11 @@ func NewHandler(service *Service) *Handler {
 }
 
 func (h *Handler) CreateInvestmentHandler(w http.ResponseWriter, r *http.Request) {
+	if ct := r.Header.Get("Content-Type"); ct != "application/json" {
+		helpers.RespondWithError(w, http.StatusUnsupportedMediaType, "Content-Type must be application/json")
+		return
+	}
+
 	req := new(models.CreateInvestmentRequest)
 	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 		h.handleInvestmentError(w, err)
@@ -46,6 +52,11 @@ func (h *Handler) GetInvestmentByIDHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	if _, err := uuid.Parse(id); err != nil {
+		helper.RespondWithError(w, http.StatusBadRequest, "invalid investment ID format")
+		return
+	}
+
 	investment, err := h.service.getInvestmentByID(r.Context(), id)
 	if err != nil {
 		h.handleInvestmentError(w, err)
@@ -60,6 +71,11 @@ func (h *Handler) ListCustomerInvestmentsHandler(w http.ResponseWriter, r *http.
 	id := chi.URLParam(r, "customerId")
 	if id == "" {
 		helper.RespondWithError(w, http.StatusBadRequest, "customer ID is required")
+		return
+	}
+
+	if _, err := uuid.Parse(id); err != nil {
+		helper.RespondWithError(w, http.StatusBadRequest, "invalid customer ID format")
 		return
 	}
 
@@ -85,6 +101,16 @@ func (h *Handler) GetCustomerFundTotalHandler(w http.ResponseWriter, r *http.Req
 	fund_id := chi.URLParam(r, "fundId")
 	if customer_id == "" || fund_id == "" {
 		helper.RespondWithError(w, http.StatusBadRequest, "customer ID and fund ID required")
+		return
+	}
+
+	if _, err := uuid.Parse(customer_id); err != nil {
+		helper.RespondWithError(w, http.StatusBadRequest, "invalid customer ID format")
+		return
+	}
+
+	if _, err := uuid.Parse(fund_id); err != nil {
+		helper.RespondWithError(w, http.StatusBadRequest, "invalid fund ID format")
 		return
 	}
 

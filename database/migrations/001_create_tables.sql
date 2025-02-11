@@ -1,4 +1,4 @@
--- I had initially had this named customers and included an is_retail boolean 
+-- Note: I had initially had this named customers and included an is_retail boolean 
 -- with the idea being a shared customer DB table for both employees and retail
 -- but as the spec requirement asked to keep retail customer functionality separate I decided
 -- to opt for a separate table

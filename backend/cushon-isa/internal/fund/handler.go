@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	mw "github.com/stcol316/cushon-isa/internal/middleware"
 	helper "github.com/stcol316/cushon-isa/pkg/helpers"
 )
@@ -43,6 +44,11 @@ func (h *Handler) GetFundByIdHandler(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
 		helper.RespondWithError(w, http.StatusBadRequest, "customer ID is required")
+		return
+	}
+
+	if _, err := uuid.Parse(id); err != nil {
+		helper.RespondWithError(w, http.StatusBadRequest, "invalid fund ID format")
 		return
 	}
 
