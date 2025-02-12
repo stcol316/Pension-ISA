@@ -48,6 +48,7 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 - **Materialized View Refresh:** We trigger a refresh on the materialized view after each investment
 - **Transaction Rollbacks:** If we fail to update the materialized view we rollback the transaction to ensure data consistency (Likely not ideal behaviour in the real world but it's pretty neat and serves a good example of the atomicity required in financial transations)
 - **Environment variables** Environment variables set .env file and read into config
+- **Fund Limit:** Customers limited to investing in one fund. I chose to do this in the backend code rather than put limitations within the DB as it is easier to switch out at a later date if this limitation is removed.
 
 ## API Design
 - **Versioning:** Versioning implemented from the start
