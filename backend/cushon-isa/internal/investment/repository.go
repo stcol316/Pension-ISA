@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	isaerrors "github.com/stcol316/cushon-isa/internal/errors"
 	"github.com/stcol316/cushon-isa/internal/models"
 )
 
@@ -23,6 +24,24 @@ func NewRepository(db *sql.DB) *Repository {
 }
 
 func (r *Repository) createInvestment(ctx context.Context, investment *models.Investment) error {
+	// Note: Limit customers to one fund. Remove to allow multiple
+	var existingFundID *string
+	exerr := r.db.QueryRowContext(ctx, `
+        SELECT DISTINCT fund_id 
+        FROM investments 
+        WHERE customer_id = $1 
+        LIMIT 1
+    `, investment.CustomerID).Scan(&existingFundID)
+
+	if exerr != nil && exerr != sql.ErrNoRows {
+		return fmt.Errorf("failed to check existing investments: %w", exerr)
+	}
+
+	// If customer has existing investments, ensure it's the same fund
+	if exerr != sql.ErrNoRows && *existingFundID != investment.FundID {
+		return isaerrors.ErrDifferentFundNotAllowed
+	}
+
 	// Note: We begin a transaction that will rollback our actions if either insert or materialized view refresh fails
 	// This ensures data consistency between the investments table and view
 	tx, txerr := r.db.BeginTx(ctx, nil)
