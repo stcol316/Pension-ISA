@@ -10,9 +10,11 @@ import (
 	"github.com/stcol316/cushon-isa/internal/models"
 )
 
-type FundRepository interface {
-	listFunds(ctx context.Context) ([]*models.Fund, error)
-	getFundByID(ctx context.Context, id string) (*models.Fund, error)
+type InvestmentRepository interface {
+	CreateInvestment(ctx context.Context, investment *models.Investment) error
+	ListInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) ([]models.Investment, int, error)
+	GetInvestmentByID(ctx context.Context, id string) (*models.Investment, error)
+	GetCustomerFundTotal(ctx context.Context, customerID, fundID string) (*models.InvestmentSummary, error)
 }
 
 type Repository struct {
@@ -23,7 +25,7 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) createInvestment(ctx context.Context, investment *models.Investment) error {
+func (r *Repository) CreateInvestment(ctx context.Context, investment *models.Investment) error {
 	// Note: Limit customers to one fund. Remove to allow multiple
 	var existingFundID *string
 	exerr := r.db.QueryRowContext(ctx, `
@@ -80,7 +82,7 @@ func (r *Repository) createInvestment(ctx context.Context, investment *models.In
 	return nil
 }
 
-func (r *Repository) listInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) ([]models.Investment, int, error) {
+func (r *Repository) ListInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) ([]models.Investment, int, error) {
 	offset := (page - 1) * pageSize
 
 	// First, get total count
@@ -122,7 +124,7 @@ func (r *Repository) listInvestmentsByCustomerID(ctx context.Context, id string,
 
 }
 
-func (r *Repository) getInvestmentByID(ctx context.Context, id string) (*models.Investment, error) {
+func (r *Repository) GetInvestmentByID(ctx context.Context, id string) (*models.Investment, error) {
 	query := `
 	SELECT id, customer_id, fund_id, amount
 	FROM investments

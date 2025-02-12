@@ -18,7 +18,7 @@ func NewService(repo *Repository) *Service {
 
 func (s *Service) createInvestment(ctx context.Context, req *models.CreateInvestmentRequest) (*models.Investment, error) {
 	investment := models.NewInvestment(req.CustomerID, req.FundID, req.Amount)
-	if err := s.repo.createInvestment(ctx, &investment); err != nil {
+	if err := s.repo.CreateInvestment(ctx, &investment); err != nil {
 		return nil, fmt.Errorf("failed to make investment: %w", err)
 	}
 
@@ -26,7 +26,7 @@ func (s *Service) createInvestment(ctx context.Context, req *models.CreateInvest
 }
 
 func (s *Service) listInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) (*mw.PaginatedResult, error) {
-	funds, total, err := s.repo.listInvestmentsByCustomerID(ctx, id, page, pageSize)
+	funds, total, err := s.repo.ListInvestmentsByCustomerID(ctx, id, page, pageSize)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list funds: %w", err)
 	}
@@ -48,7 +48,7 @@ func (s *Service) listInvestmentsByCustomerID(ctx context.Context, id string, pa
 }
 
 func (s *Service) getInvestmentByID(ctx context.Context, id string) (*models.Investment, error) {
-	return s.repo.getInvestmentByID(ctx, id)
+	return s.repo.GetInvestmentByID(ctx, id)
 }
 
 func (s *Service) getCustomerFundTotal(ctx context.Context, customer_id, fund_id string) (*models.InvestmentSummary, error) {
