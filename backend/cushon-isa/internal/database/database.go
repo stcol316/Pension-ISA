@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/stcol316/cushon-isa/internal/config"
 	"github.com/stcol316/cushon-isa/internal/models"
 )
 
@@ -20,15 +21,15 @@ type PostgresDB struct {
 	db *sql.DB
 }
 
-var (
-	db_name     = "dev_db"
-	db_user     = "dev_user"
-	db_password = "bEeBwv2JWoFp16Pq1+se3qNGaVoAAgAvKFgBkn5eGeQ="
-	port        = "5433"
-	host        = "localhost"
-)
+func NewPostgresDB(cfg *config.Config) (*PostgresDB, error) {
+	var (
+		db_name     = cfg.DBName
+		db_user     = cfg.DBUser
+		db_password = cfg.DBPassword
+		port        = cfg.DBPort
+		host        = cfg.DBHost
+	)
 
-func NewPostgresDB() (*PostgresDB, error) {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", db_user, db_password, host, port, db_name)
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

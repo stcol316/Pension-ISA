@@ -1,14 +1,22 @@
 # Pension-ISA
 This solution is mostly focused on the backend, database, data structures, API and overall repo structure.
 
-Any features listed below that are no bold are features that were either planned and not added or simply considerations for improvement.
+Any features listed below that are not bold are features that were either planned and not added or simply considerations for improvement.
 
 Attempts were made to try and adhere to some DDD principles within the limited scope of the project. Care was given to ensure clear separation of concerns on the backend.
 
-Postman and pgAdmin were used to test the APIs and DB. Please note that some API routes are protected. Steps to bypass this in Postman can be found under the Security section.
+I have tried to provide a breadth of basic implementations but many of the features can be expanded upon.
 
 Particular points of note are tagged throughout the codebase with the **Note** tag.
 Planned improvements are tagged through the codebase with the **TODO** tag.
+
+## How To Run
+The database is containerised and can be run in docker via **docker-compose up  --build**
+This will also seed the database with some inital data.
+
+The backend can be started via the Makefile using **make run** if it has not also been added to the docker-compose file at the time of viewing.
+
+Postman and pgAdmin were used to test the APIs and DB. Please note that some API routes are protected. Steps to bypass this in Postman can be found under the Security section.
 
 ## Database
 - **PostgreSQL:** PostgreSQL was chosen for the reasons outlined below
@@ -39,7 +47,7 @@ Planned improvements are tagged through the codebase with the **TODO** tag.
 - **Pagination:** Custom pagination middleware to allow configurable page sizes of returned data
 - **Materialized View Refresh:** We trigger a refresh on the materialized view after each investment
 - **Transaction Rollbacks:** If we fail to update the materialized view we rollback the transaction to ensure data consistency (Likely not ideal behaviour in the real world but it's pretty neat and serves a good example of the atomicity required in financial transations)
-- Environment variables
+- **Environment variables** Environment variables set .env file and read into config
 
 ## API Design
 - **Versioning:** Versioning implemented from the start

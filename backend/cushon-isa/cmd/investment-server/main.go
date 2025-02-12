@@ -10,6 +10,7 @@ import (
 
 	"net/http"
 
+	"github.com/stcol316/cushon-isa/internal/config"
 	"github.com/stcol316/cushon-isa/internal/customer"
 	"github.com/stcol316/cushon-isa/internal/database"
 	"github.com/stcol316/cushon-isa/internal/fund"
@@ -19,10 +20,15 @@ import (
 
 func main() {
 
-	fmt.Println("Main entered...")
+	fmt.Println("Loading config...")
+
+	cfg, cfgerr := config.Load()
+	if cfgerr != nil {
+		log.Fatalf("Failed to load config: %v", cfgerr)
+	}
 
 	//Note: Easily swappable database configuration
-	db_service, dberr := database.NewPostgresDB()
+	db_service, dberr := database.NewPostgresDB(cfg)
 	if dberr != nil {
 		log.Fatal(dberr)
 	}
@@ -43,7 +49,7 @@ func main() {
 	fundHandler := fund.NewHandler(fundService)
 	investmentHandler := investment.NewHandler(investmentService)
 
-	server := server.NewServer(8080, customerHandler, fundHandler, investmentHandler)
+	server := server.NewServer(cfg, customerHandler, fundHandler, investmentHandler)
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
