@@ -1,11 +1,11 @@
 # Pension-ISA
 This solution is mostly focused on the backend, database, data structures, API and overall repo structure.
 
-Any features listed below that are not bold are features that were either planned and not added or simply considerations for improvement.
+Any features listed below that are not **bold** are features that were either planned and not added or simply considerations for improvement.
 
 Attempts were made to try and adhere to some DDD principles within the limited scope of the project. Care was given to ensure clear separation of concerns on the backend.
 
-I have tried to provide a breadth of basic implementations but many of the features can be expanded upon.
+I have tried to provide a breadth of basic implementations. Of course, many of the features can be expanded upon.
 
 Particular points of note are tagged throughout the codebase with the **Note** tag.
 Planned improvements are tagged through the codebase with the **TODO** tag.
@@ -49,6 +49,7 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 - **Transaction Rollbacks:** If we fail to update the materialized view we rollback the transaction to ensure data consistency (Likely not ideal behaviour in the real world but it's pretty neat and serves a good example of the atomicity required in financial transations)
 - **Environment variables** Environment variables set .env file and read into config
 - **Fund Limit:** Customers limited to investing in one fund. I chose to do this in the backend code rather than put limitations within the DB as it is easier to switch out at a later date if this limitation is removed.
+- **Database Healthcheck:** A Go routine that periodically pings the database and gathers some statistics
 
 ## API Design
 - **Versioning:** Versioning implemented from the start
@@ -59,15 +60,15 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 ## Containerisation
 - **Docker Compose:** Docker is used to run the Postgres DB in a container. If time permits I will also add the backend and frontend to containers
 
-## Frontend
-- **Abandoned:** Started then swiftly abandoned once I had clarification on the scope of this test. I am leaving it in as I will likely come back and work on this at a late date.
+## Frontend (ABANDONED)
+- **Abandoned:** Started then swiftly abandoned once I had clarification on the scope of this project. I am leaving it in as I will likely come back and work on this at a late date.
 - **Scope:** Minimalist frontend implementation. More focus has been given to project structure, design choices and backend functionality
 - **Vite:** Vite used for quick frontend deployment
 - **Typescript:** React and Typescript used on the frontend
 
 ## Security
-- **Secrets:** For now I have stored them in text files to be read into docker-compose. This is not ideal but is suitable for the current implementation. For our actual environments we would want to make use of a dedicated secret storage that supports secret rotation such as AWS Secrets Manager of Hashicorp Vault.
-- **Secret Generation:** A script is used to generate secrets
+- **Secrets:** For now I have stored them in text files to be read into docker-compose. This is not ideal but is suitable for the current implementation. For our actual environments we would want to make use of a dedicated secret storage that supports secret rotation such as AWS Secrets Manager or Hashicorp Vault.
+- **Secret Generation:** A script is used to generate secrets (found under /scripts)
 - **JWT Auth:** Authentication used to protect certain API routes. To test these routes via postman you can use the following settings under Authorization in your Postman call:
     - Auth Type: JWT Bearer
     - Add JWT to: Request Header
@@ -77,7 +78,7 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 - Rate limiting
 
 ## Testing
-- Go unit tests
+- **Unit Tests** Basic happy path unit tests implemented for the repository files. Obviously testing should be greatly expanded upon in an ideal situation. Testing makes use of mocks and Testify.
 - Jest + React Testing Library
 - DB integration testing
 
@@ -86,6 +87,7 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 - Event driven
 
 ## Monitoring and Metrics ##
+- **DB Metrics:** Currently gather database connection metrics
 
 ## Potential AWS Integration ##
 
