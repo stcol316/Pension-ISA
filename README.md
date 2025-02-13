@@ -31,7 +31,7 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 - **Data Availability:** Both provide multi-AZ deployment options for higher data availabilty and durability
 - **Database Seeding:** Test data seeding provided for development environment only
 - **Generated UUIDs:** Randomly generated UUIDs provided by uuid-ossp. The preference for this over sequenced IDs is to allow for the potential of database sharding in a distributed sysem. This also has the added benefit of enhanced security as IDs cannot be easily iterated through.
-- **Data Normalisation:** Currently database is at 3NF. If time allows after initial implementation we will increase this
+- **Data Normalisation:** Currently the database adheres to at least BCNF
 - **Materialised Views:** A materialised view is used to determine the total investment that a user has made to a particular fund
 - **Indexing:** Indexing on certain keys to provide faster lookups
 
