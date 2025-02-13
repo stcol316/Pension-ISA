@@ -32,19 +32,23 @@ func main() {
 	if dberr != nil {
 		log.Fatal(dberr)
 	}
-	fmt.Printf("%+v\n", db_service)
+	fmt.Println("Starting Healthcheck go routine")
+	db_service.StartHealthCheck(1 * time.Minute)
 
 	// Note: Repository Pattern. Handles data access
+	fmt.Println("Creating Repository Layer")
 	customerRepo := customer.NewRepository(db_service.DB())
 	fundRepo := fund.NewRepository(db_service.DB())
 	investmentRepo := investment.NewRepository(db_service.DB())
 
 	// Note: Service layer to handle business logic between DB and handlers
+	fmt.Println("Creating Service Layer")
 	customerService := customer.NewService(customerRepo)
 	fundService := fund.NewService(fundRepo)
 	investmentService := investment.NewService(investmentRepo)
 
 	// Note: Presentation layer to handle APIs
+	fmt.Println("Creating Presentation Layer")
 	customerHandler := customer.NewHandler(customerService)
 	fundHandler := fund.NewHandler(fundService)
 	investmentHandler := investment.NewHandler(investmentService)
@@ -55,7 +59,7 @@ func main() {
 	done := make(chan bool, 1)
 
 	// Run graceful shutdown in a separate goroutine
-	go gracefulShutdown(server, done)
+	go gracefulShutdown(server, db_service, done)
 
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
@@ -69,7 +73,7 @@ func main() {
 }
 
 // Note: Graceful shutdown
-func gracefulShutdown(apiServer *http.Server, done chan bool) {
+func gracefulShutdown(apiServer *http.Server, db_service *database.PostgresDB, done chan bool) {
 	// Create context that listens for the interrupt signal from the OS.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -88,6 +92,10 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 	}
 
 	log.Println("Server exiting")
+
+	if err := db_service.Close(); err != nil {
+		log.Printf("Failed to close database connection: %v", err)
+	}
 
 	// Notify the main goroutine that the shutdown is complete
 	done <- true
