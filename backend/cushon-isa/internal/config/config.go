@@ -25,11 +25,8 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	// Load .env file only in development
-	if os.Getenv("GO_ENV") != "production" {
-		if err := godotenv.Load(); err != nil {
-			fmt.Printf("Warning: .env file not found: %v\n", err)
-		}
+	if err := godotenv.Load(); err != nil {
+		fmt.Printf("Warning: .env file not found: %v\n", err)
 	}
 
 	config := &Config{

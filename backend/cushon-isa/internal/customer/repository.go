@@ -9,9 +9,9 @@ import (
 )
 
 type CustomerRepository interface {
-	createRetailCustomer(ctx context.Context, customer *models.RetailCustomer) error
-	getRetailCustomerByEmail(ctx context.Context, email string) (*models.RetailCustomer, error)
-	getRetailCustomerByID(ctx context.Context, id string) (*models.RetailCustomer, error)
+	CreateRetailCustomer(ctx context.Context, customer *models.RetailCustomer) error
+	GetRetailCustomerByEmail(ctx context.Context, email string) (*models.RetailCustomer, error)
+	GetRetailCustomerByID(ctx context.Context, id string) (*models.RetailCustomer, error)
 }
 
 type Repository struct {

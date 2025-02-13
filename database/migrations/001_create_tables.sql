@@ -10,11 +10,17 @@ CREATE TABLE retail_customers (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE risk_levels (
+    id SMALLINT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT
+);
+
 CREATE TABLE funds (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    risk_level VARCHAR(50),
+    risk_level_id SMALLINT REFERENCES risk_levels(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -23,5 +29,6 @@ CREATE TABLE investments (
     customer_id UUID REFERENCES retail_customers(id),
     fund_id UUID REFERENCES funds(id),
     amount DECIMAL(10,2) NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT positive_amount CHECK (amount > 0)
 );

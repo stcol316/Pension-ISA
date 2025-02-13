@@ -25,7 +25,7 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) CreateInvestment(ctx context.Context, investment *models.Investment) error {
+func (r *Repository) createInvestment(ctx context.Context, investment *models.Investment) error {
 	// Note: Limit customers to one fund. Remove to allow multiple
 	var existingFundID *string
 	exerr := r.db.QueryRowContext(ctx, `
@@ -82,7 +82,7 @@ func (r *Repository) CreateInvestment(ctx context.Context, investment *models.In
 	return nil
 }
 
-func (r *Repository) ListInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) ([]models.Investment, int, error) {
+func (r *Repository) listInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) ([]models.Investment, int, error) {
 	offset := (page - 1) * pageSize
 
 	// First, get total count
@@ -124,7 +124,7 @@ func (r *Repository) ListInvestmentsByCustomerID(ctx context.Context, id string,
 
 }
 
-func (r *Repository) GetInvestmentByID(ctx context.Context, id string) (*models.Investment, error) {
+func (r *Repository) getInvestmentByID(ctx context.Context, id string) (*models.Investment, error) {
 	query := `
 	SELECT id, customer_id, fund_id, amount
 	FROM investments
@@ -149,7 +149,7 @@ func (r *Repository) GetInvestmentByID(ctx context.Context, id string) (*models.
 }
 
 // Note: This is fetching data from the materialized view
-func (r *Repository) GetCustomerFundTotal(ctx context.Context, customerID, fundID string) (*models.InvestmentSummary, error) {
+func (r *Repository) getCustomerFundTotal(ctx context.Context, customerID, fundID string) (*models.InvestmentSummary, error) {
 	query := `
         SELECT 
             customer_id,

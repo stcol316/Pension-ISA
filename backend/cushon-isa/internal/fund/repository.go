@@ -10,7 +10,7 @@ import (
 
 type FundRepository interface {
 	ListFunds(ctx context.Context, page, pageSize int) ([]models.Fund, int, error)
-	getFundByID(ctx context.Context, id string) (*models.Fund, error)
+	GetFundByID(ctx context.Context, id string) (*models.Fund, error)
 }
 
 type Repository struct {
@@ -57,7 +57,7 @@ func (r *Repository) listFunds(ctx context.Context, page, pageSize int) ([]model
 
 func (r *Repository) getFundByID(ctx context.Context, id string) (*models.Fund, error) {
 	query := `
-	SELECT id, name, description, risk_level
+	SELECT id, name, description, risk_level_id
 	FROM funds
 	WHERE id = $1
 `
