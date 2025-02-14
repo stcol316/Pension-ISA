@@ -61,7 +61,7 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
 - **Docker Compose:** Docker is used to run the Postgres DB in a container. If time permits I will also add the backend and frontend to containers
 
 ## Frontend (ABANDONED)
-- **Abandoned:** Started then swiftly abandoned once I had clarification on the scope of this project. I am leaving it in as I will likely come back and work on this at a late date.
+- **Abandoned:** Started then swiftly abandoned once I had clarification on the scope of this project. I am leaving it in as I will likely come back and work on this at a later date.
 - **Scope:** Minimalist frontend implementation. More focus has been given to project structure, design choices and backend functionality
 - **Vite:** Vite used for quick frontend deployment
 - **Typescript:** React and Typescript used on the frontend
@@ -76,6 +76,9 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
     - Secret: secret
 - **Input validation:** Simple input validation. Could be greatly expanded upon
 - Rate limiting
+- Query timeouts
+- Query retries with exponential backoff
+- Proper use of interfaces looser coupling
 
 ## Testing
 - **Unit Tests** Basic happy path unit tests implemented for the repository files. Obviously testing should be greatly expanded upon in an ideal situation. Testing makes use of mocks and Testify.

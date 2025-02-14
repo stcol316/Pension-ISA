@@ -10,6 +10,7 @@ import (
 	"github.com/stcol316/cushon-isa/internal/models"
 )
 
+// TODO: Use interfaces at service level instead of "repo *Repository"
 type InvestmentRepository interface {
 	CreateInvestment(ctx context.Context, investment *models.Investment) error
 	ListInvestmentsByCustomerID(ctx context.Context, id string, page, pageSize int) ([]models.Investment, int, error)

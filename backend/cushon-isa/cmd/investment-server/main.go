@@ -19,12 +19,14 @@ import (
 )
 
 func main() {
-
+	// TODO: We should implement a proper logging solution
 	fmt.Println("Loading config...")
 
 	cfg, cfgerr := config.Load()
 	if cfgerr != nil {
 		log.Fatalf("Failed to load config: %v", cfgerr)
+		// TODO: A default config may be appropriate in conjunction with correct secret management
+		// For now though, as we rely on secrets being loaded from this file we consider this fatal
 	}
 
 	//Note: Easily swappable database configuration

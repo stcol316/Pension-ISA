@@ -10,7 +10,7 @@ type Investment struct {
 	FundID     string    `json:"fundId"`
 	Amount     float64   `json:"amount"`
 	CreatedAt  time.Time `json:"createdAt"`
-	Status     string    `json:"status"` // TODO: We probably want something to confirm status of investments here
+	Status     string    `json:"status"` // TODO: We might want something to confirm status of investments here
 }
 
 type InvestmentSummary struct {

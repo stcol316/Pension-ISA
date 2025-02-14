@@ -79,7 +79,7 @@ func (p *PostgresDB) HealthCheck() map[string]string {
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		log.Printf("db down: %v", err)
 		return stats
 	}
 
@@ -98,6 +98,7 @@ func (p *PostgresDB) HealthCheck() map[string]string {
 	stats["max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
 
 	// Evaluate stats to provide a health message
+	//TODO: These values should all be set in config
 	if dbStats.OpenConnections > 40 { // Assuming 50 is the max for this example
 		stats["message"] = "The database is experiencing heavy load."
 	}
