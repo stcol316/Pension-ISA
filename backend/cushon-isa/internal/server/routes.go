@@ -1,9 +1,7 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -44,9 +42,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		MaxAge:           300,
 	}))
 
-	// Test route
-	r.Get("/", s.HelloWorldHandler)
-
 	// Customer routes
 	//Note: API versioning
 	//TODO: Split into separate services to facilitate microservice architecture
@@ -78,20 +73,5 @@ func (s *Server) RegisterRoutes() http.Handler {
 		})
 	})
 
-	//TODO: Ping the database periodically
-	// r.Get("/health", s.healthHandler)
-
 	return r
-}
-
-func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
-	}
-
-	_, _ = w.Write(jsonResp)
 }
