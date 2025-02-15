@@ -76,7 +76,6 @@ Postman and pgAdmin were used to test the APIs and DB. Please note that some API
     - Secret: secret
 - **Input validation:** Simple input validation. Could be greatly expanded upon
 - Rate limiting
-- Query timeouts
 - Query retries with exponential backoff
 - Proper use of interfaces looser coupling
 
